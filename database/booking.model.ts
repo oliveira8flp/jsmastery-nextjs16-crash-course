@@ -17,7 +17,6 @@ const BookingSchema = new Schema<IBooking>(
       type: Schema.Types.ObjectId,
       ref: "Event",
       required: [true, "Event ID is required"],
-      index: true, // Index for faster queries by event
     },
     email: {
       type: String,
@@ -34,6 +33,15 @@ const BookingSchema = new Schema<IBooking>(
     timestamps: true, // Auto-generate createdAt and updatedAt
   }
 );
+
+// Indexes for efficient querying and data integrity
+BookingSchema.index({ eventId: 1 });
+BookingSchema.index({ email: 1 });
+BookingSchema.index({ eventId: 1, email: 1 }, {
+  unique: true,
+  name: "uniq_event_email",
+});
+BookingSchema.index({ eventId: 1, createdAt: -1 });
 
 // Pre-save hook to validate that the referenced event exists
 BookingSchema.pre("save", async function (next) {
